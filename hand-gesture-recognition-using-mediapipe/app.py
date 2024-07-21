@@ -70,7 +70,7 @@ def main():
 
     point_history_classifier = PointHistoryClassifier()
 
-    # ラベル読み込み ###########################################################
+    # Read labels ###########################################################
     with open('model/keypoint_classifier/keypoint_classifier_label.csv',
               encoding='utf-8-sig') as f:
         keypoint_classifier_labels = csv.reader(f)
@@ -85,14 +85,14 @@ def main():
             row[0] for row in point_history_classifier_labels
         ]
 
-    # FPS計測モジュール ########################################################
+    # FPS MEasurment ########################################################
     cvFpsCalc = CvFpsCalc(buffer_len=10)
 
-    # 座標履歴 #################################################################
+    #Coordinate history  #################################################################
     history_length = 16
     point_history = deque(maxlen=history_length)
 
-    # フィンガージェスチャー履歴 ################################################
+    # Finger gesture history ################################################
     finger_gesture_history = deque(maxlen=history_length)
 
     #  ########################################################################
@@ -101,11 +101,13 @@ def main():
     while True:
         fps = cvFpsCalc.get()
 
-        # キー処理(ESC：終了) #################################################
+        #Process Key (ESC: end) #################################################
         key = cv.waitKey(10)
         if key == 27:  # ESC
             break
-        number, mode = select_mode(key, mode)
+        # number, mode = select_mode(key, mode)
+        mode = 2 
+        number = folderi anuny 
 
         # カメラキャプチャ #####################################################
         ret, image = cap.read()
@@ -125,21 +127,22 @@ def main():
         if results.multi_hand_landmarks is not None:
             for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
                                                   results.multi_handedness):
-                # 外接矩形の計算
+                # Bounding box calculation
                 brect = calc_bounding_rect(debug_image, hand_landmarks)
-                # ランドマークの計算
+                # Landmark calculation
                 landmark_list = calc_landmark_list(debug_image, hand_landmarks)
 
-                # 相対座標・正規化座標への変換
+                # Conversion to relative coordinates / normalized coordinates
                 pre_processed_landmark_list = pre_process_landmark(
                     landmark_list)
                 pre_processed_point_history_list = pre_process_point_history(
                     debug_image, point_history)
-                # 学習データ保存
+                #Write to the dataset file
                 logging_csv(number, mode, pre_processed_landmark_list,
                             pre_processed_point_history_list)
+                print("this is the preprocessed landmark list ", pre_processed_landmark_list)
 
-                # ハンドサイン分類
+                #  Hand sign classification
                 hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
                 if hand_sign_id == 2:  # 指差しサイン
                     point_history.append(landmark_list[8])  # 人差指座標
@@ -187,7 +190,7 @@ def select_mode(key, mode):
         number = key - 48
     if key == 110:  # n
         mode = 0
-    if key == 107:  # k
+    if key == 107:  # k  if clissifies point saving
         mode = 1
     if key == 104:  # h
         mode = 2
@@ -217,13 +220,16 @@ def calc_landmark_list(image, landmarks):
 
     landmark_point = []
 
-    # キーポイント
+    # Keypoint
+    # print(landmarks,"the landmarks from calc_landmark_list")
     for _, landmark in enumerate(landmarks.landmark):
         landmark_x = min(int(landmark.x * image_width), image_width - 1)
         landmark_y = min(int(landmark.y * image_height), image_height - 1)
         # landmark_z = landmark.z
 
         landmark_point.append([landmark_x, landmark_y])
+
+    # print(landmark_point,"the landmark_point from calc_landmark_list")   
 
     return landmark_point
 
@@ -286,6 +292,8 @@ def logging_csv(number, mode, landmark_list, point_history_list):
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow([number, *landmark_list])
+            # for my code i can change the number value with the correct y value which in my case is the letter name for sign language 
+            # also to use this part of the code, i need to change the (0,=numbrt<=9), and pass as a stream my full dataset
     if mode == 2 and (0 <= number <= 9):
         csv_path = 'model/point_history_classifier/point_history.csv'
         with open(csv_path, 'a', newline="") as f:
