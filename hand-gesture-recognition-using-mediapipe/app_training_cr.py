@@ -35,15 +35,29 @@ def main():
     keypoint_classifier = KeyPointClassifier()
     point_history_classifier = PointHistoryClassifier()
 
-    # Process each image in the dataset
+    # # Process each image in the dataset
+    # for label_folder in os.listdir(dataset_path):
+    #     label_path = os.path.join(dataset_path)
+    #     print("---------label path----------",label_path,"/n")
+    #     if os.path.isdir(label_path):
+    #         for img_file in os.listdir(label_path):
+    #             print("---------img_file-------", img_file,"--------")
+    #             img_path = os.path.join(label_path, img_file)
+    #             print("---------img path-------", img_path,"/n")
+    #             print(f"Processing file: {img_path}")  # Debug print
+    #             process_image(img_path, label_folder, hands, keypoint_classifier, point_history_classifier, output_csv)
+
     for label_folder in os.listdir(dataset_path):
-        print(label_folder,"  -----------  ", dataset_path)
         label_path = os.path.join(dataset_path, label_folder)
+        print("---------label path----------", dataset_path, "/n")
         if os.path.isdir(label_path):
             for img_file in os.listdir(label_path):
+                print("---------img_file-------", img_file, "--------")
                 img_path = os.path.join(label_path, img_file)
+                print("---------img path-------", img_path, "/n")
                 print(f"Processing file: {img_path}")  # Debug print
                 process_image(img_path, label_folder, hands, keypoint_classifier, point_history_classifier, output_csv)
+
 
 def process_image(img_path, label, hands, keypoint_classifier, point_history_classifier, output_csv):
     # Ensure the image path is correct
@@ -70,8 +84,8 @@ def process_image(img_path, label, hands, keypoint_classifier, point_history_cla
         for hand_landmarks in results.multi_hand_landmarks:
             landmark_list = calc_landmark_list(debug_image, hand_landmarks)
             pre_processed_landmark_list = pre_process_landmark(landmark_list)
-            pre_processed_point_history_list = pre_process_point_history(debug_image, deque([landmark_list], maxlen=1))
-            logging_csv(label, 2, pre_processed_landmark_list, pre_processed_point_history_list, output_csv)
+            # pre_processed_point_history_list = pre_process_point_history(debug_image, deque([landmark_list], maxlen=1))
+            logging_csv(label, 2, pre_processed_landmark_list, output_csv)
 
 def calc_landmark_list(image, landmarks):
     image_width, image_height = image.shape[1], image.shape[0]
@@ -106,11 +120,11 @@ def pre_process_point_history(image, point_history):
     temp_point_history = list(itertools.chain.from_iterable(temp_point_history))
     return temp_point_history
 
-def logging_csv(label, mode, landmark_list, point_history_list, output_csv):
+def logging_csv(label, mode, landmark_list, output_csv):
     if mode == 2:
         with open(output_csv, 'a', newline="") as f:
             writer = csv.writer(f)
-            writer.writerow([label, *landmark_list, *point_history_list])
+            writer.writerow([label, *landmark_list])
 
 if __name__ == '__main__':
     main()
