@@ -105,9 +105,9 @@ def main():
         key = cv.waitKey(10)
         if key == 27:  # ESC
             break
-        # number, mode = select_mode(key, mode)
-        mode = 2 
-        number = folderi anuny 
+        number, mode = select_mode(key, mode)
+        # mode = 2 
+        # number = folderi anuny 
 
         # カメラキャプチャ #####################################################
         ret, image = cap.read()
