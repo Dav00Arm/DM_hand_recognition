@@ -65,5 +65,15 @@ class KeyPointClassifier(object):
 
         # Interpret the result
         result_index = np.argmax(np.squeeze(result))
+        # print("the confidance or argmax",result,"\n")
+        confidence_score = np.max(result)
+        print("the confidance or argmax",confidence_score,"\n")
 
-        return result_index
+        # confidence_scores.append((predicted_class, confidence_score))
+    
+        # if confidence_score >= 0.98:
+        #     return result_index
+        # else:
+        #     return 
+
+        return result_index, confidence_score

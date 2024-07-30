@@ -143,8 +143,8 @@ def main():
                 print("this is the preprocessed landmark list ", pre_processed_landmark_list)
 
                 #  Hand sign classification
-                hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
-                if hand_sign_id == 2:  # 指差しサイン
+                hand_sign_id, conf = keypoint_classifier(pre_processed_landmark_list)
+                if hand_sign_id == 200:  # 指差しサイン
                     point_history.append(landmark_list[8])  # 人差指座標
                 else:
                     point_history.append([0, 0])
@@ -171,12 +171,14 @@ def main():
                 #     keypoint_classifier_labels[hand_sign_id],
                     # point_history_classifier_labels[most_common_fg_id[0][0]],
                 # )
-                debug_image = draw_info_text_result(
-                    debug_image,
-                    brect,
-                    handedness,
-                    keypoint_classifier_labels[hand_sign_id]
-                )
+
+                if conf > 0.99:
+                    debug_image = draw_info_text_result(
+                        debug_image,
+                        brect,
+                        handedness,
+                        keypoint_classifier_labels[hand_sign_id]
+                    )
                 
         else:
             point_history.append([0, 0])
@@ -571,6 +573,32 @@ def draw_info(image, fps, mode, number):
                        cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1,
                        cv.LINE_AA)
     return image
+
+def calculate_confidence_scores(model, input_data):
+    """
+    Calculate confidence scores for the given input data using the provided model.
+
+    Args:
+        model (keras.Model): Trained Keras model.
+        input_data (np.ndarray): Input data for prediction (keypoint representations).
+
+    Returns:
+        List of tuples: Each tuple contains the predicted class and its confidence score.
+    """
+    # Get the model's predictions
+    predictions = model.predict(input_data)
+
+    # Calculate confidence scores
+    confidence_scores = []
+    for prediction in predictions:
+        # Get the predicted class (the class with the highest probability)
+        predicted_class = np.argmax(prediction)
+        # Get the confidence score for the predicted class
+        confidence_score = np.max(prediction)
+        confidence_scores.append((predicted_class, confidence_score))
+    
+    return confidence_scores
+
 
 
 if __name__ == '__main__':
