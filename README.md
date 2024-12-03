@@ -1,18 +1,17 @@
-"# Davit and Marianna Hand Recognition" 
-WE have started by training the model in english letter signs 
+We have started by training the model in English letter signs 
 
 the dataset for training was 
-we have not considered augumenting the dataset at this point becouse the dataset was not bad
+we have not considered augmenting the dataset at this point because the dataset was not bad
 
 first 
-we have converted the dataset into a "understandable for the model" format, becouse there were an already ready training code for this 
-the model which also was edited becouse of being too small
+we have converted the dataset into an "understandable for the model" format because there was an already ready training code for this 
+the model was also edited because it was too small
 we have made it a bit bigger with different logic, just to help it learn all the gestures 
-but becouse the meaning of the program is to teach a sign we need our detection to be as precise as possible and thats when 
-confidance score will come handy 
-currently we are adding confidance score calculation section, and becouse we are geting a probability distribution as an output form our model , with 27 classes one of them none, we are going to play wiht it
+but because the meaning of the program is to teach a sign we need our detection to be as precise as possible and that's when 
+confidence score will come in handy 
+currently, we are adding a confidence score calculation section, and because we are getting a probability distribution as an output from our model, with 27 classes one of them none, we are going to play with it
  
- As a good practice we are going to use validation set for understanding shich confidance treshhold will provide the best information 
+ As a good practice, we are going to use the validation set to understand which confidence threshold will provide the best information 
  quality 
 
  Calculating Confidence Score
